@@ -28,3 +28,7 @@ export async function getOneHashtag ( req, res ) {
         return res.status(500).send(err.message);
     }
 }
+
+export async function soma (a, b, c) {
+    return a + b + c
+}
