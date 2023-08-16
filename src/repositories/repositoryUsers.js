@@ -12,6 +12,18 @@ export async function postRequisitionRegisterSend(query, queryParams) {
     return existingUserResultSend;
 };
 
+// verificando se o email ja esta no sistema
+export async function postRequisitionLogin(email) {
+    const emailExistsQueryResult = await db.query('SELECT * FROM users WHERE email = $1;', [email]);
+    return emailExistsQueryResult;
+};
+
+// enviar os dados pro servidor pra quando o login der certo
+export async function postRequisitionLoginSend(name, email, token) {
+    const existingUserResultSend = await db.query('INSERT INTO sessoes (name,email,token) VALUES ($1, $2, $3)', [name, email, token]);
+    return existingUserResultSend;
+};
+
 
 
 
