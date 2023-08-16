@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerTable } from "../schemas/userSchema.js";
+import { loginTable, registerTable } from "../schemas/userSchema.js";
 import { validateSchema } from "../middlewares/validateSchema.js";
 import { loginPost, registerPost } from "../controllers/controlUsers.js";
 
