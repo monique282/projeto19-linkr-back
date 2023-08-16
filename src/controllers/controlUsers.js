@@ -13,7 +13,7 @@ import {
 export async function registerPost(req, res) {
 
     // pegar os dados que a pessoa colocou na tela de cadastro
-    const { name, email, photo, password, confirmPassword } = req.body;
+    const { name, email, photo, password } = req.body;
 
     try {
 
@@ -22,11 +22,6 @@ export async function registerPost(req, res) {
 
         if (existingUserEmail.rows.length > 0) {
             return res.status(409).send({ message: "E-mail já cadastrado. Por favor, utilize outro e-mail." });
-        }
-
-        // verificando se as senhas são iguais
-        if (password !== confirmPassword) {
-            return res.status(422).send({ message: "Senha e Confirmar senha não são iguais." });
         }
 
         // cripitografas a senha 
