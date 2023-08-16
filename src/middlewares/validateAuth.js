@@ -1,5 +1,4 @@
-import db from "../database/database.connection.js";
-import { selectSessionsByToken } from "../repositories/home.repository.js";
+import { selectSessionsByToken } from "../repositories/posts.repository.js";
 
 export default async function validateAuth(req, res, next) {
   const authorization = req.headers.authorization;
