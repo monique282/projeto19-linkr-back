@@ -25,6 +25,8 @@ export async function postRequisitionRegisterSend(query, queryParams) {
 
 
 
+
+
 export async function postRequisitionRegisterCpf(cpf) {
     const existingUserResult = await db.query('SELECT * FROM users WHERE cpf = $1', [cpf]);
     return existingUserResult;

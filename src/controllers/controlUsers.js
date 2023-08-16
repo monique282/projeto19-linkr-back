@@ -8,6 +8,8 @@ import { v4 as uuid } from 'uuid';
 import {
     postRequisitionRegisterEmail, postRequisitionRegisterSend
 } from '../repository/repositoryUsers.js';
+import { postRequisitionLoginSend } from '../repositories/repositoryUsers.js';
+
 
 // essa função aqui serve para enviar um post para criar um cadastro
 export async function registerPost(req, res) {
