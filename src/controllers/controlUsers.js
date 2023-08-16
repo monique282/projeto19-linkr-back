@@ -69,6 +69,37 @@ export async function registerPost(req, res) {
     };
 };
 
+// essa função aqui serve pra envia um poste e fazer login
+export async function loginPost(req, res) {
 
+    // pegar os dados que a pessoa colocou na tela de cadastro
+    const { email, password } = req.body;
+
+    try {
+
+        // verificando se o email ja esta cadastrado
+        const emailExistsQuery = await postRequisitionLogin(email);
+        if (emailExistsQuery.rows.length === 0) {
+            return res.status(401).send({ message: "E-mail não cadastrado. Por favor, utilize um e-mail valido, ou faça o cadastro." });
+        }
+
+        // vericiar se a senha esta correta
+        const correctPassword = bcrypt.compareSync(password, emailExistsQuery.rows[0].password);
+        if (!correctPassword) {
+            return res.status(401).send({ message: "Senha incorreta" });
+        }
+
+        // gernado o token
+        const token = uuid();
+
+        // enviar os dados pro servidor pra quando o cadastro der certo
+        await postRequisitionLoginSend(emailExistsQuery.rows[0].name, email, token);
+        return res.status(200).send({ name: emailExistsQuery.rows[0].name, token });
+
+
+    } catch (erro) {
+        res.status(500).send(erro.message);
+    };
+};
 
 
