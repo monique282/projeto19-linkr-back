@@ -20,7 +20,7 @@ export async function postRequisitionLogin(email) {
 
 // enviar os dados pro servidor pra quando o login der certo
 export async function postRequisitionLoginSend(name, email, token) {
-    const existingUserResultSend = await db.query('INSERT INTO sessoes (name,email,token) VALUES ($1, $2, $3)', [name, email, token]);
+    const existingUserResultSend = await db.query('INSERT INTO sessions (name,email,token) VALUES ($1, $2, $3)', [name, email, token]);
     return existingUserResultSend;
 };
 
