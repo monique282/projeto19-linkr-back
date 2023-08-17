@@ -17,18 +17,18 @@ export async function getOneHashtagDB(hashtag) {
     const query = `
         SELECT
         users.name AS name,
-        users.image AS image,
+        users.image AS picture,
         posts.id AS "postId",
         posts.content AS content,
         posts.url AS url,
-        COUNT(likes."userId") AS "numberLikes"
+        COUNT(likes."userId") AS likes
             FROM hashtags
             JOIN posts ON hashtags."postId" = posts.id
             JOIN users ON posts."userId" = users.id
             LEFT JOIN likes ON likes."postId" = posts.id
             WHERE hashtags.name = $1
             GROUP BY users.id, posts.id
-            ORDER BY "numberLikes" DESC;
+            ORDER BY posts.id DESC;
     `;
     return db.query(query, [hashtag])
 }
