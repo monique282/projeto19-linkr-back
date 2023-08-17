@@ -6,17 +6,15 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import {
+    postRequisitionLogin, postRequisitionLoginSend,
     postRequisitionRegisterEmail, postRequisitionRegisterSend
-} from '../repository/repositoryUsers.js';
-import { postRequisitionLogin, postRequisitionLoginSend }
-    from '../repositories/repositoryUsers.js';
-
+} from '../repositories/repositoryUsers.js';
 
 // essa função aqui serve para enviar um post para criar um cadastro
 export async function registerPost(req, res) {
 
     // pegar os dados que a pessoa colocou na tela de cadastro
-    const { name, email, photo, password } = req.body;
+    const { name, email, image, password } = req.body;
 
     try {
 
@@ -30,7 +28,7 @@ export async function registerPost(req, res) {
         // cripitografas a senha 
         const passwordsafe = bcrypt.hashSync(password, 2);
 
-        let query = 'INSERT INTO users (email, password, name, photo) VALUES ($1, $2, $3, $4,) ';
+        let query = 'INSERT INTO users (email, password, name, image) VALUES ($1, $2, $3, $4)';
         const queryParams = [];
 
         // Verificando os parâmetros enviados pela query são validos
@@ -48,12 +46,11 @@ export async function registerPost(req, res) {
             return res.status(422).send({ message: "Formato de email invalido." });
         };
 
-
         // verificando se o photo é valida
-        if (typeof photo !== 'undefined' && photo !== '') {
-            queryParams.push(photo);
+        if (typeof image !== 'undefined' && image !== '') {
+            queryParams.push(image);
         } else {
-            return res.status(422).send({ message: "Formato de senha invalido." });
+            return res.status(422).send({ message: "Formato de imagem invalido." });
         };
 
         // verificando se a senha é valida
