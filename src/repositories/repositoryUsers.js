@@ -1,4 +1,4 @@
-import { db } from '../database/database.connection.js';
+import db from "../database/database.connection.js"
 
 // verificando se o email ja esta cadastrado
 export async function postRequisitionRegisterEmail(email) {
@@ -12,37 +12,15 @@ export async function postRequisitionRegisterSend(query, queryParams) {
     return existingUserResultSend;
 };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-export async function postRequisitionRegisterCpf(cpf) {
-    const existingUserResult = await db.query('SELECT * FROM users WHERE cpf = $1', [cpf]);
-    return existingUserResult;
-};
-
-
-
-export async function postRequisitionLogin(email) {
+// verificando se o email ja esta no sistema
+export async function postRequisitionLogi(email) {
     const emailExistsQueryResult = await db.query('SELECT * FROM users WHERE email = $1;', [email]);
     return emailExistsQueryResult;
 };
 
+// enviar os dados pro servidor pra quando o login der certo
 export async function postRequisitionLoginSend(name, email, token) {
-    const existingUserResultSend = await db.query('INSERT INTO usersLogged (name,email,token) VALUES ($1, $2, $3)', [name, email, token]);
+    const existingUserResultSend = await db.query('INSERT INTO sessions (name,email,token) VALUES ($1, $2, $3)', [name, email, token]);
     return existingUserResultSend;
 };
 
-export async function getRequisitionUserProducts(idseler) {
-    const userProductsResult = await db.query('SELECT * FROM users WHERE email = $1;', [idseler]);
-    return userProductsResult;
-};
