@@ -1,5 +1,5 @@
 import { Router } from "express";
-import userRouter from "./userRoutes";
+import userRouter from "./userRoutes.js";
 import homeRouter from "./home.routes.js";
 import postsRouter from "./posts.routes.js";
 
