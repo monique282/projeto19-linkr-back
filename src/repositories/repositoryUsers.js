@@ -13,7 +13,7 @@ export async function postRequisitionRegisterSend(query, queryParams) {
 };
 
 // verificando se o email ja esta no sistema
-export async function postRequisitionLogi(email) {
+export async function postRequisitionLogin(email) {
     const emailExistsQueryResult = await db.query('SELECT * FROM users WHERE email = $1;', [email]);
     return emailExistsQueryResult;
 };
