@@ -6,10 +6,11 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import {
+    postRequisitionLogin,
+    postRequisitionLoginSend,
     postRequisitionRegisterEmail, postRequisitionRegisterSend
-} from '../repository/repositoryUsers.js';
-import { postRequisitionLogin, postRequisitionLoginSend }
-    from '../repositories/repositoryUsers.js';
+} from '../repositories/repositoryUsers.js';
+
 
 
 // essa função aqui serve para enviar um post para criar um cadastro
