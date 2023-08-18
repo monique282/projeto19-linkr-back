@@ -28,10 +28,10 @@ export async function sendPosts(){
   posts.content AS content,
   posts.url AS url,
   COUNT(likes."userId") AS "numberLikes"
-  FROM posts
-  JOIN users ON posts."userId" = users.id
-  LEFT JOIN likes ON likes."postId" = posts.id
-  GROUP BY "userId", users.name, users.image, "postId", posts.content, posts.url
-  ORDER BY "postId" DESC
-  LIMIT 20`)
+FROM posts
+JOIN users ON posts."userId" = users.id
+LEFT JOIN likes ON likes."postId" = posts.id
+GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
+ORDER BY posts.id DESC
+LIMIT 20;`)
 }
