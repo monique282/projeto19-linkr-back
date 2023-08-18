@@ -96,8 +96,8 @@ export async function loginPost(req, res) {
         const token = uuid();
 
         // enviar os dados pro servidor pra quando o cadastro der certo
-        await postRequisitionLoginSend(emailExistsQuery.rows[0].id, token);
-        return res.status(200).send({ userId: emailExistsQuery.rows[0].id, token });
+        await postRequisitionLoginSend( token, emailExistsQuery.rows[0].id);
+        return res.status(200).send({  token, userId: emailExistsQuery.rows[0].id });
 
 
     } catch (erro) {
