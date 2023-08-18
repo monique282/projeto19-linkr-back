@@ -31,7 +31,7 @@ export async function sendPosts(){
   FROM posts
   JOIN users ON posts."userId" = users.id
   LEFT JOIN likes ON likes."postId" = posts.id
-  GROUP BY "userId", users.name, users.image, "postId", posts.content, posts.url
+  GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
   ORDER BY "postId" DESC
   LIMIT 20`)
 }
