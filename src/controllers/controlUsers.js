@@ -32,18 +32,26 @@ export async function registerPost(req, res) {
         const queryParams = [];
 
         // Verificando os parâmetros enviados pela query são validos
-        // verificando se name é valido
-        if (typeof name !== 'undefined' && name !== '') {
-            queryParams.push(name);
-        } else {
-            return res.status(422).send({ message: "Formato de nome invalido." });
-        };
-
+        
         // verificando se o email é valido
         if (typeof email !== 'undefined' && email !== '') {
             queryParams.push(email);
         } else {
             return res.status(422).send({ message: "Formato de email invalido." });
+        };
+
+         // verificando se a senha é valida
+         if (typeof password !== 'undefined' && password !== '') {
+            queryParams.push(passwordsafe);
+        } else {
+            return res.status(422).send({ message: "Formato de confirmar senha invalido." });
+        };
+
+        // verificando se name é valido
+        if (typeof name !== 'undefined' && name !== '') {
+            queryParams.push(name);
+        } else {
+            return res.status(422).send({ message: "Formato de nome invalido." });
         };
 
         // verificando se o photo é valida
@@ -53,12 +61,7 @@ export async function registerPost(req, res) {
             return res.status(422).send({ message: "Formato de imagem invalido." });
         };
 
-        // verificando se a senha é valida
-        if (typeof password !== 'undefined' && password !== '') {
-            queryParams.push(passwordsafe);
-        } else {
-            return res.status(422).send({ message: "Formato de confirmar senha invalido." });
-        };
+       
 
         // enviar os dados pro servidor pra quando o cadastro der certo
         await postRequisitionRegisterSend(query, queryParams);
@@ -93,8 +96,8 @@ export async function loginPost(req, res) {
         const token = uuid();
 
         // enviar os dados pro servidor pra quando o cadastro der certo
-        await postRequisitionLoginSend(emailExistsQuery.rows[0].name, email, token);
-        return res.status(200).send({ name: emailExistsQuery.rows[0].name, token });
+        await postRequisitionLoginSend(emailExistsQuery.rows[0].id, token);
+        return res.status(200).send({ userId: emailExistsQuery.rows[0].id, token });
 
 
     } catch (erro) {
