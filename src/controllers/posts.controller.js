@@ -34,3 +34,12 @@ export async function likePost(req,res) {
     res.status(500).send(err.message);
   }
 }
+
+export async function getPosts(req,res) {
+  try{
+    return res.status(200).send(await func.sendPosts())
+  } catch(err){
+    console.log(err)
+    res.status(500).send(err.message);
+  }
+}
