@@ -5,7 +5,7 @@ export async function selectSessionsByToken(token) {
 }
 
 export async function createPost(url, content, userId) {
-  return await db.query(`INSER INTO posts (url, content, "userId") VALUES ($1, $2, $3)`, [url, content, userId])
+  return await db.query(`INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3)`, [url, content, userId])
 }
 
 export async function selectPostById(postId) {
@@ -19,4 +19,19 @@ export async function removeLike(userId, postId){
   return await db.query(`DELETE FROM likes WHERE userId = $1 AND postId = $2`, [userId, postId])
 }
 
-export async function sendPosts()
+export async function sendPosts(){
+  return await db.query(`SELECT 
+  users.id AS "userId",
+  users.name AS name,
+  users.image AS image,
+  posts.id AS "postId",
+  posts.content AS content,
+  posts.url AS url,
+  COUNT(likes."userId") AS "numberLikes"
+  FROM posts
+  JOIN users ON posts."userId" = users.id
+  LEFT JOIN likes ON likes."postId" = posts.id
+  GROUP BY "userId", users.name, users.image, "postId", posts.content, posts.url
+  ORDER BY "postId" DESC
+  LIMIT 20`)
+}
