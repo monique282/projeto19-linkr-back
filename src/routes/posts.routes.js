@@ -8,4 +8,5 @@ const postsRouter = Router();
 
 postsRouter.post("/new-post", validateAuth, validateSchema(postSchema), newPost);
 
+
 export default postsRouter;
