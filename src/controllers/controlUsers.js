@@ -6,7 +6,7 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import {
-    deleteSendSessionsToken, postRequisitionLogin,
+    deleteSendSessionsToken, getRequisitionUser, postRequisitionLogin,
     postRequisitionLoginSend, postRequisitionRegisterEmail,
     postRequisitionRegisterSend, postRequisitionValidateToken
 } from '../repositories/repositoryUsers.js';
@@ -124,6 +124,25 @@ export async function usersSessionslete(req, res) {
 
         // se tudo der certo
         res.sendStatus(204);
+
+    } catch (erro) {
+        res.status(500).send(erro.message);
+    };
+}
+
+// função para realizar a busca no servidor 
+export async function performSearchNoServerGet(req, res) {
+    // pegando as informação digitadas na barra de pesquisa
+    const { name } = req.params;
+
+    try {
+
+        // fazendo a requisição para buscar o usuario na tabela 
+        const result = await getRequisitionUser(name);
+
+        // se tudo der certo
+        const usersRequest = result.rows;
+        res.send(usersRequest);
 
     } catch (erro) {
         res.status(500).send(erro.message);
