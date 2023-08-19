@@ -5,7 +5,7 @@ export async function selectSessionsByToken(token) {
 }
 
 export async function createPost(url, content, userId) {
-  return await db.query(`INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3);`, [url, content, userId])
+  return await db.query(`INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3) RETURNING posts.id;`, [url, content, userId])
 }
 
 export async function selectPostById(postId) {
@@ -39,8 +39,7 @@ export async function sendPosts(){
   posts.id AS "postId",
   posts.content AS content,
   posts.url AS url,
-  COUNT(likes."userId") AS "numberLikes",
-  ARRAY_AGG(likes."userId") AS "likedUserIds"
+  COUNT(likes."userId") AS "numberLikes"
 FROM posts
 JOIN users ON posts."userId" = users.id
 LEFT JOIN likes ON likes."postId" = posts.id

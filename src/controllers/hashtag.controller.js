@@ -1,4 +1,4 @@
-import { getHashtagsDB, getOneHashtagDB } from "../repositories/hashtag.repository";
+import { getHashtagsDB, getOneHashtagDB } from "../repositories/hashtag.repository.js";
 
 export async function getHashtags ( req, res ) {
     const { user } = res.locals;

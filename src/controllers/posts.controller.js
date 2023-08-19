@@ -4,7 +4,10 @@ export async function newPost(req,res) {
   try {
     const {userId} = res.locals.user
 
-    await func.createPost(url, content, userId)
+    const post = await func.createPost(url, content, userId)
+
+    const hashtagsValues = hashtags.map(hashtag => [hashtag, post.rows[0].id]);
+    await func.insertHashtags(hashtagsValues);
 
     res.status(201).send({message: "Nova publicação registrada com sucesso!"});
   } catch (err) {
