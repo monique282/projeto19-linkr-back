@@ -18,16 +18,19 @@ export async function likePost(req,res) {
   try{
     const {userId: idUser} = res.locals.user
     const checkPost = await func.selectPostById(postId)
+
     if(idUser !== userId) return res.status(400).send({message: "Inconsistência com os dados de usuário."})
     if(checkPost.rowCount === 0) return res.status(404).send({message: "ID de post incorreto"})
 
-    if(isLiked) {
-      await func.insertLike(postId, userId)
-      return res.status(200).send({message: "Like aplicado!"})
-    } else {
-      await func.deleteLike(postId, userId)
-      return res.status(200).send({message: "Like removido!"})
-    }
+
+      res.status(200).send(await func.handleLike(postId, userId))
+    // if(isLiked) {
+    //   await func.insertLike(postId, userId)
+    //   return res.status(200).send({message: "Like aplicado!"})
+    // } else {
+    //   await func.removeLike(postId, userId)
+    //   return res.status(200).send({message: "Like removido!"})
+    // }
 
   } catch (err) {
     console.log(err)
