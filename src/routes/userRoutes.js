@@ -8,6 +8,6 @@ const userRouter = Router();
 userRouter.post("/signup", validateSchema(registerTable), registerPost);
 userRouter.post("/signin", validateSchema(loginTable), loginPost);
 userRouter.delete("/logout", usersSessionslete);
-userRouter.get("/search", performSearchNoServerGet);
+userRouter.get("/search/:name", performSearchNoServerGet);
 
 export default userRouter;

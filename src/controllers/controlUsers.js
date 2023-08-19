@@ -133,8 +133,8 @@ export async function usersSessionslete(req, res) {
 // função para realizar a busca no servidor 
 export async function performSearchNoServerGet(req, res) {
     // pegando as informação digitadas na barra de pesquisa
-    const { name } = req.body;
-    console.log(name)
+    const { name } = req.params;
+
     try {
 
         // fazendo a requisição para buscar o usuario na tabela 
