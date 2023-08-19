@@ -24,3 +24,12 @@ export async function postRequisitionLoginSend(token, userId) {
     return existingUserResultSend;
 };
 
+export async function postRequisitionValidateToken(token) {
+    const userLogeedResult = await db.query('SELECT * FROM sessions WHERE token = $1;', [token]);
+    return userLogeedResult;
+};
+
+export async function deleteSendSessionsToken(token) {
+    const serveSend = await db.query(`DELETE FROM sessions WHERE "token" = $1;`, [token]);
+    return serveSend;
+};
