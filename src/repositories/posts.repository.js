@@ -39,11 +39,21 @@ export async function sendPosts(){
   posts.id AS "postId",
   posts.content AS content,
   posts.url AS url,
-  COUNT(likes."userId") AS "numberLikes"
+  COUNT(likes."userId") AS "numberLikes",
+  ARRAY_AGG(likes."userId") AS "likedUserIds"
 FROM posts
 JOIN users ON posts."userId" = users.id
 LEFT JOIN likes ON likes."postId" = posts.id
 GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
 ORDER BY posts.id DESC
 LIMIT 20;`)
+}
+
+export async function insertHashtags(values) {
+  const query = `
+    INSERT INTO hashtags (name, "postId") VALUES ${values.map((_, index) => `($${index * 2 + 1}, $${index * 2 + 2})`).join(', ')}
+  `;
+
+  const queryParams = values.flat();
+  await db.query(query, queryParams);
 }
