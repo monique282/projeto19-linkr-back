@@ -5,7 +5,7 @@ export async function selectSessionsByToken(token) {
 }
 
 export async function createPost(url, content, userId) {
-  return await db.query(`INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3) RETURNING posts.id`, [url, content, userId])
+  return await db.query(`INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3) RETURNING posts.id;`, [url, content, userId])
 }
 
 export async function selectPostById(postId) {
