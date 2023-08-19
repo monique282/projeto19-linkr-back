@@ -2,13 +2,12 @@ import db from "../database/database.connection.js";
 
 export async function getHashtagsDB() {
     const query = `
-        SELECT COUNT(hashtags.name) AS "hashtagCount", hashtags.name AS hashtag, hashtags.id AS id
+        SELECT COUNT(hashtags.name) AS "hashtagCount", hashtags.name AS hashtag
             FROM hashtags 
             JOIN posts ON hashtags."postId" = posts.id
-            GROUP BY hashtags.name, hashtags.id
+            GROUP BY hashtags.name
             ORDER BY "hashtagCount" DESC
             LIMIT 10;
-    
     `;
     return db.query(query);
 }
@@ -17,11 +16,11 @@ export async function getOneHashtagDB(hashtag) {
     const query = `
         SELECT
         users.name AS name,
-        users.image AS picture,
+        users.image AS image,
         posts.id AS "postId",
         posts.content AS content,
         posts.url AS url,
-        COUNT(likes."userId") AS likes
+        COUNT(likes."userId") AS "numberLikes"
             FROM hashtags
             JOIN posts ON hashtags."postId" = posts.id
             JOIN users ON posts."userId" = users.id
