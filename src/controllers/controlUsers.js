@@ -6,8 +6,9 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import {
-    postRequisitionLogin, postRequisitionLoginSend,
-    postRequisitionRegisterEmail, postRequisitionRegisterSend
+    deleteSendSessionsToken, postRequisitionLogin,
+    postRequisitionLoginSend, postRequisitionRegisterEmail,
+    postRequisitionRegisterSend, postRequisitionValidateToken
 } from '../repositories/repositoryUsers.js';
 
 // essa função aqui serve para enviar um post para criar um cadastro
@@ -32,7 +33,7 @@ export async function registerPost(req, res) {
         const queryParams = [];
 
         // Verificando os parâmetros enviados pela query são validos
-        
+
         // verificando se o email é valido
         if (typeof email !== 'undefined' && email !== '') {
             queryParams.push(email);
@@ -40,8 +41,8 @@ export async function registerPost(req, res) {
             return res.status(422).send({ message: "Formato de email invalido." });
         };
 
-         // verificando se a senha é valida
-         if (typeof password !== 'undefined' && password !== '') {
+        // verificando se a senha é valida
+        if (typeof password !== 'undefined' && password !== '') {
             queryParams.push(passwordsafe);
         } else {
             return res.status(422).send({ message: "Formato de confirmar senha invalido." });
@@ -60,8 +61,6 @@ export async function registerPost(req, res) {
         } else {
             return res.status(422).send({ message: "Formato de imagem invalido." });
         };
-
-       
 
         // enviar os dados pro servidor pra quando o cadastro der certo
         await postRequisitionRegisterSend(query, queryParams);
@@ -96,8 +95,8 @@ export async function loginPost(req, res) {
         const token = uuid();
 
         // enviar os dados pro servidor pra quando o cadastro der certo
-        await postRequisitionLoginSend( token, emailExistsQuery.rows[0].id);
-        return res.status(200).send({  token, userId: emailExistsQuery.rows[0].id, image: emailExistsQuery.rows[0].image });
+        await postRequisitionLoginSend(token, emailExistsQuery.rows[0].id);
+        return res.status(200).send({ token, userId: emailExistsQuery.rows[0].id, image: emailExistsQuery.rows[0].image });
 
 
     } catch (erro) {
@@ -105,4 +104,28 @@ export async function loginPost(req, res) {
     };
 };
 
+// função que deleta o usuario da tabela de sessoes
+export async function usersSessionslete(req, res) {
 
+    // pegando os dados do token
+    const { authorization } = req.headers;
+    const token = authorization?.replace("Bearer ", "")
+
+    try {
+
+        // validando o token
+        const userLogeed = await postRequisitionValidateToken(token);
+        if (userLogeed.rows.length === 0) {
+            return res.status(401).send({ message: "Usuário não autorizado." });
+        };
+
+        // fazendo a requisição para deletar usuario logado da tabela 
+        await deleteSendSessionsToken(token);
+
+        // se tudo der certo
+        res.sendStatus(204);
+
+    } catch (erro) {
+        res.status(500).send(erro.message);
+    };
+}
