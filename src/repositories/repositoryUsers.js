@@ -33,3 +33,9 @@ export async function deleteSendSessionsToken(token) {
     const serveSend = await db.query(`DELETE FROM sessions WHERE "token" = $1;`, [token]);
     return serveSend;
 };
+
+// verificando os usuarios na tabela 
+export async function getRequisitionUser(name) {
+    const ExistingUsersResult = await db.query(`SELECT * FROM users WHERE LOWER(name) LIKE LOWER($1 || '%')`, [name]);
+    return ExistingUsersResult;
+};
