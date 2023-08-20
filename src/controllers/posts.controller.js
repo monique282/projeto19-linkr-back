@@ -6,12 +6,11 @@ export async function newPost(req,res) {
 
     const post = await func.createPost(url, content, userId)
 
-    const hashtagsValues = hashtags.map(hashtag => [hashtag, post.rows[0].id]);
+    const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
     await func.insertHashtags(hashtagsValues);
 
     res.status(201).send({message: "Nova publicação registrada com sucesso!"});
   } catch (err) {
-    console.log(err)
     res.status(500).send(err.message);
   }
 }
@@ -26,7 +25,7 @@ export async function likePost(req,res) {
     if(checkPost.rowCount === 0) return res.status(404).send({message: "ID de post incorreto"})
 
 
-      res.status(200).send(await func.handleLike(postId, userId))
+      return res.status(200).send(await func.handleLike(postId, userId))
     if(isLiked) {
       await func.insertLike(postId, userId)
       return res.status(200).send({message: "Like aplicado!"})
@@ -36,7 +35,6 @@ export async function likePost(req,res) {
     }
 
   } catch (err) {
-    console.log(err)
     res.status(500).send(err.message);
   }
 }
@@ -45,7 +43,6 @@ export async function getPosts(req,res) {
   try{
     return res.status(200).send(await func.sendPosts())
   } catch(err){
-    console.log(err)
     res.status(500).send(err.message);
   }
 }
