@@ -62,3 +62,26 @@ export async function getPostsById(req, res) {
     res.status(500).send(err.message)
   }
 }
+
+// função de deleta o post do usuario logado
+export async function postDelete(req, res) {
+  const { id } = req.params;
+  try {
+
+      // verificando se o post existe 
+      const postExists = await func.getRequisitionPostId(id);
+
+      // verificando se a short é valida
+      if (postExists.rows.length === 0) {
+          return res.status(404).send("Post não encontrado");
+      };
+
+      // se tudo der certo
+      // atualizando o status
+      await func.deleteSendPostId(id)
+      res.sendStatus(200);
+
+  } catch (erro) {
+      res.status(500).send(erro.message);
+  };
+}
