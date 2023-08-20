@@ -15,12 +15,14 @@ export async function getHashtagsDB() {
 export async function getOneHashtagDB(hashtag) {
     const query = `
         SELECT
+        users.id AS "userId",
         users.name AS name,
         users.image AS image,
         posts.id AS "postId",
         posts.content AS content,
         posts.url AS url,
-        COUNT(likes."userId") AS "numberLikes"
+        COUNT(likes."userId") AS "numberLikes",
+        ARRAY_AGG(likes."userId") AS "likedUserIds"
             FROM hashtags
             JOIN posts ON hashtags."postId" = posts.id
             JOIN users ON posts."userId" = users.id
