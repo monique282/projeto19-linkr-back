@@ -46,3 +46,19 @@ export async function getPosts(req,res) {
     res.status(500).send(err.message);
   }
 }
+
+export async function getPostsById(req, res) {
+  const { id } = req.params
+  try {
+    const posts = await func.getUserPosts(id)
+    const userInfo = await func.getUserInfo(id)
+    const obj = {
+      name: userInfo.rows[0].name,
+      image: userInfo.rows[0].image,
+      posts: posts.rows
+    }
+    res.status(200).send(obj)
+  } catch(err) {
+    res.status(500).send(err.message)
+  }
+}
