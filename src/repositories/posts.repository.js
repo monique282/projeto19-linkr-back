@@ -40,13 +40,16 @@ export async function sendPosts(){
   posts.content AS content,
   posts.url AS url,
   COUNT(likes."userId") AS "numberLikes",
-  ARRAY_AGG(likes."userId") AS "likedUserIds"
+  ARRAY_AGG(likes."userId") AS "likedUserIds",
+  COALESCE(ARRAY_AGG(users.name) FILTER (WHERE likes."userId" IS NOT NULL), ARRAY[]::TEXT[]) AS "likedUserNames"
 FROM posts
 JOIN users ON posts."userId" = users.id
 LEFT JOIN likes ON likes."postId" = posts.id
 GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
 ORDER BY posts.id DESC
-LIMIT 20;`)
+LIMIT 20;
+
+`)
 }
 
 export async function insertHashtags(values) {

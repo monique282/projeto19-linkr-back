@@ -27,13 +27,13 @@ export async function likePost(req,res) {
 
 
       res.status(200).send(await func.handleLike(postId, userId))
-    // if(isLiked) {
-    //   await func.insertLike(postId, userId)
-    //   return res.status(200).send({message: "Like aplicado!"})
-    // } else {
-    //   await func.removeLike(postId, userId)
-    //   return res.status(200).send({message: "Like removido!"})
-    // }
+    if(isLiked) {
+      await func.insertLike(postId, userId)
+      return res.status(200).send({message: "Like aplicado!"})
+    } else {
+      await func.removeLike(postId, userId)
+      return res.status(200).send({message: "Like removido!"})
+    }
 
   } catch (err) {
     console.log(err)
