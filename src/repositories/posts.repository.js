@@ -20,7 +20,6 @@ export async function handleLike(postId, userId) {
     `SELECT * FROM likes WHERE "postId" = $1 AND "userId" = $2;`,
     [postId, userId]
   );
-  console.log(existingLike);
   if (existingLike.rows.length == 0) {
     await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2);`, [
       userId,
