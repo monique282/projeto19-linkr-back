@@ -22,7 +22,7 @@ export async function likesUser(id) {
 FROM posts 
 LEFT JOIN likes ON likes."postId" = posts.id
 LEFT JOIN users ON users.id = likes."userId"
-WHERE users.id = $1
+WHERE posts."userId" = $1
 GROUP BY posts.id, posts.url, posts.content
 ORDER BY posts.id DESC
 LIMIT 20;
