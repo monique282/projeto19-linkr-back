@@ -91,7 +91,9 @@ export async function editPostById(req, res) {
     const promise = await func.updatePost(content, id);
     if(content.match(/#\w+/g)){
       const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), id]);
-      await func.insertHashtags(hashtags);
+      console.log(hashtagsValues)
+      await func.insertHashtags(hashtagsValues);
+    
     }
     
     res.status(201).send("Post editado!");

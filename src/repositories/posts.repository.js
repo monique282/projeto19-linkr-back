@@ -111,7 +111,7 @@ export async function deleteSendPostId(id) {
 };
 
 export async function deleteHashtags(id) {
-  const promise = db.query(`DELETE hashtags WHERE "postId" = $1`, [id])
+  const promise = db.query(`DELETE FROM hashtags WHERE "postId" = $1;`, [id])
   return promise
 }
 
