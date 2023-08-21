@@ -59,7 +59,7 @@ export async function insertHashtags(values) {
   const query = `
     INSERT INTO hashtags (name, "postId") VALUES ${values
       .map((_, index) => `($${index * 2 + 1}, $${index * 2 + 2})`)
-      .join(", ")}
+      .join(", ")};
   `;
 
   const queryParams = values.flat();
@@ -93,8 +93,13 @@ LIMIT 20;
 export async function getUserInfo(id) {
   const promise = db.query(
     `
-  SELECT users.name, users.image FROM users WHERE users.id = $1`,
+  SELECT users.name, users.image FROM users WHERE users.id = $1;`,
     [id]
   );
   return promise;
+}
+
+export async function updatePost(content, id) {
+  const promise = db.query(`UPDATE posts SET content = $1 WHERE id = $2;`, [content, id]);
+  return promise
 }

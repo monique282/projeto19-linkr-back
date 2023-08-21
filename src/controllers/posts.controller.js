@@ -62,3 +62,15 @@ export async function getPostsById(req, res) {
     res.status(500).send(err.message)
   }
 }
+
+export async function editPostById(req, res) {
+  const { content } = req.body;
+  const { id } = req.params;
+
+  try {
+    const promise = await func.updatePost(content, id);
+    res.status(201).send("Post editado!");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
