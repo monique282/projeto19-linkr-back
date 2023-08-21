@@ -5,7 +5,7 @@ export async function newPost(req,res) {
     const {userId} = res.locals.user
 
     const post = await func.createPost(url, content, userId)
-    if(content.split(" ").includes("#")){
+    if(content.match(/#\w+/g)){
       const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
       await func.insertHashtags(hashtagsValues);
     }
