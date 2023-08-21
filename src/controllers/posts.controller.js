@@ -82,11 +82,18 @@ export async function postDelete(req, res) {
 }
 
 export async function editPostById(req, res) {
-  const { content } = req.body;
+  const { content, hashtags } = req.body;
   const { id } = req.params;
 
   try {
+    await func.deleteHashtags(id);
+
     const promise = await func.updatePost(content, id);
+    if(content.match(/#\w+/g)){
+      const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), id]);
+      await func.insertHashtags(hashtags);
+    }
+    
     res.status(201).send("Post editado!");
   } catch (err) {
     res.status(500).send(err.message);
