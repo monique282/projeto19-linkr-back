@@ -5,9 +5,11 @@ export async function newPost(req,res) {
     const {userId} = res.locals.user
 
     const post = await func.createPost(url, content, userId)
-
-    const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
-    await func.insertHashtags(hashtagsValues);
+    if(content.split(" ").includes("#")){
+      const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
+      await func.insertHashtags(hashtagsValues);
+    }
+    
 
     res.status(201).send({message: "Nova publicação registrada com sucesso!"});
   } catch (err) {
@@ -26,13 +28,6 @@ export async function likePost(req,res) {
 
 
       return res.status(200).send(await func.handleLike(postId, userId))
-    if(isLiked) {
-      await func.insertLike(postId, userId)
-      return res.status(200).send({message: "Like aplicado!"})
-    } else {
-      await func.removeLike(postId, userId)
-      return res.status(200).send({message: "Like removido!"})
-    }
 
   } catch (err) {
     res.status(500).send(err.message);
