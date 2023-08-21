@@ -5,9 +5,11 @@ export async function newPost(req,res) {
     const {userId} = res.locals.user
 
     const post = await func.createPost(url, content, userId)
-
-    const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
-    await func.insertHashtags(hashtagsValues);
+    if(content.match(/#\w+/g)){
+      const hashtagsValues = hashtags.map(hashtag => [hashtag.toLowerCase(), post.rows[0].id]);
+      await func.insertHashtags(hashtagsValues);
+    }
+    
 
     res.status(201).send({message: "Nova publicação registrada com sucesso!"});
   } catch (err) {
@@ -26,13 +28,6 @@ export async function likePost(req,res) {
 
 
       return res.status(200).send(await func.handleLike(postId, userId))
-    if(isLiked) {
-      await func.insertLike(postId, userId)
-      return res.status(200).send({message: "Like aplicado!"})
-    } else {
-      await func.removeLike(postId, userId)
-      return res.status(200).send({message: "Like removido!"})
-    }
 
   } catch (err) {
     res.status(500).send(err.message);
@@ -61,6 +56,29 @@ export async function getPostsById(req, res) {
   } catch(err) {
     res.status(500).send(err.message)
   }
+}
+
+// função de deleta o post do usuario logado
+export async function postDelete(req, res) {
+  const { id } = req.params;
+  try {
+
+      // verificando se o post existe 
+      const postExists = await func.getRequisitionPostId(id);
+
+      // verificando se a short é valida
+      if (postExists.rows.length === 0) {
+          return res.status(404).send("Post não encontrado");
+      };
+
+      // se tudo der certo
+      // atualizando o status
+      await func.deleteSendPostId(id)
+      res.sendStatus(200);
+
+  } catch (erro) {
+      res.status(500).send(erro.message);
+  };
 }
 
 export async function editPostById(req, res) {

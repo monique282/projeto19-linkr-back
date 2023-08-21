@@ -20,7 +20,6 @@ export async function handleLike(postId, userId) {
     `SELECT * FROM likes WHERE "postId" = $1 AND "userId" = $2;`,
     [postId, userId]
   );
-  console.log(existingLike);
   if (existingLike.rows.length == 0) {
     await db.query(`INSERT INTO likes ("userId", "postId") VALUES ($1, $2);`, [
       userId,
@@ -99,6 +98,17 @@ export async function getUserInfo(id) {
   return promise;
 }
 
+// verificando se o post existe
+export async function getRequisitionPostId(id) {
+  const idPostResult = await db.query('SELECT * FROM posts WHERE id = $1;', [id]);
+  return idPostResult;
+};
+
+// apagando o post
+export async function deleteSendPostId(id) {
+  const serveSend = await db.query(`DELETE FROM posts WHERE id = $1;`, [id]);
+  return serveSend;
+};
 export async function updatePost(content, id) {
   const promise = db.query(`UPDATE posts SET content = $1 WHERE id = $2;`, [content, id]);
   return promise
