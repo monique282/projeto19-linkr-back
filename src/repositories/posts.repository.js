@@ -97,3 +97,15 @@ export async function getUserInfo(id) {
   );
   return promise;
 }
+
+// verificando se o post existe
+export async function getRequisitionPostId(id) {
+  const idPostResult = await db.query('SELECT * FROM posts WHERE id = $1;', [id]);
+  return idPostResult;
+};
+
+// apagando o post
+export async function deleteSendPostId(id) {
+  const serveSend = await db.query(`DELETE FROM posts WHERE id = $1;`, [id]);
+  return serveSend;
+};
