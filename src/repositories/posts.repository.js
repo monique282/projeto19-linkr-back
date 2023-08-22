@@ -89,11 +89,19 @@ LIMIT 20;
   return promise;
 }
 
-export async function getUserInfo(id) {
+export async function getUserInfo(id, userId) {
   const promise = db.query(
     `
-  SELECT users.name, users.image FROM users WHERE users.id = $1;`,
-    [id]
+  SELECT users.name, users.image, users.id,
+    CASE
+      WHEN follows.id IS NOT NULL THEN 'following'
+      ELSE 'not following'
+    END AS status
+  FROM users 
+  LEFT JOIN follows ON follows."followedId" = users.id AND follows."followingId" = $2
+  WHERE users.id = $1;
+  `,
+    [id, userId]
   );
   return promise;
 }
