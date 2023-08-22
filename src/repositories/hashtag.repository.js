@@ -22,11 +22,13 @@ export async function getOneHashtagDB(hashtag) {
         posts.content AS content,
         posts.url AS url,
         COUNT(likes."userId") AS "numberLikes",
+        COUNT(comments."postId") AS "numberComments",
         ARRAY_AGG(likes."userId") AS "likedUserIds"
             FROM hashtags
             JOIN posts ON hashtags."postId" = posts.id
             JOIN users ON posts."userId" = users.id
             LEFT JOIN likes ON likes."postId" = posts.id
+            LEFT JOIN comments ON comments."postId" = posts.id
             WHERE hashtags.name = $1
             GROUP BY users.id, posts.id
             ORDER BY posts.id DESC;
