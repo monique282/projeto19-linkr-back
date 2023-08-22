@@ -39,3 +39,24 @@ export async function getRequisitionUser(name) {
     const ExistingUsersResult = await db.query(`SELECT * FROM users WHERE LOWER(name) LIKE LOWER($1 || '%')`, [name]);
     return ExistingUsersResult;
 };
+
+export async function situationFollowDB ( followingId, followedId ) {
+    const query = `
+        SELECT id FROM follows WHERE "followingId" = $1 AND "followedId" = $2;
+    `
+    return db.query(query, [ followingId, followedId ]);
+}
+
+export async function followDB ( followingId, followedId ) {
+    const query =`
+        INSERT INTO follows ( "followingId", "followedId" ) VALUES ( $1, $2 )
+    `
+    return db.query( query, [followingId, followedId])
+}
+
+export async function unfollowDB ( followingId, followedId ) {
+    const query = `
+        DELETE FROM follows WHERE "followingId" = $1 AND "followedId" = $2 RETURNING 'OI'
+    `
+    return db.query(query , [followingId, followedId])
+}

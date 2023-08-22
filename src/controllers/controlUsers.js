@@ -6,10 +6,11 @@
 import bcrypt from 'bcrypt';
 import { v4 as uuid } from 'uuid';
 import {
-    deleteSendSessionsToken, getRequisitionUser, postRequisitionLogin,
+    deleteSendSessionsToken, followDB, getRequisitionUser, postRequisitionLogin,
     postRequisitionLoginSend, postRequisitionRegisterEmail,
-    postRequisitionRegisterSend, postRequisitionValidateToken
+    postRequisitionRegisterSend, postRequisitionValidateToken, situationFollowDB, unfollowDB
 } from '../repositories/repositoryUsers.js';
+import db from '../database/database.connection.js';
 
 // essa função aqui serve para enviar um post para criar um cadastro
 export async function registerPost(req, res) {
@@ -146,5 +147,25 @@ export async function performSearchNoServerGet(req, res) {
 
     } catch (erro) {
         res.status(500).send(erro.message);
+    };
+}
+
+export async function follow ( req, res ) {
+    const { userId: followingId } = res.locals.user;
+    const { userId: followedId } = req.body;
+    try {
+
+        const result = await situationFollowDB( followingId, followedId );
+
+        if ( result.rowCount === 0 ) {
+            await followDB(followingId, followedId);
+            return res.sendStatus(200);
+        }
+
+        await unfollowDB(followingId, followedId);
+        return res.sendStatus(204);
+
+    } catch (err) {
+        res.status(500).send(err.message);
     };
 }
