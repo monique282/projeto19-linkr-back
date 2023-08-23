@@ -14,7 +14,7 @@ export function selectCommentsById(userId, id) {
     `
     SELECT users.image, users.name, comments.content,
     CASE 
-        WHEN posts."userId" = comments."userId" THEN 'post's author'
+        WHEN posts."userId" = comments."userId" THEN 'posts author'
         WHEN EXISTS ( SELECT 1 FROM follows 
             WHERE follows."followingId" = $1 AND follows."followedId" = comments."userId" ) THEN 'following'
         ELSE ''
