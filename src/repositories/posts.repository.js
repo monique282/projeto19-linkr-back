@@ -131,3 +131,11 @@ export async function updatePost(content, id) {
   const promise = db.query(`UPDATE posts SET content = $1 WHERE id = $2;`, [content, id]);
   return promise
 }
+
+export async function followingStatusDB (userId){
+  const query =`
+    SELECT "followedId" FROM follows
+      WHERE "followingId" = $1;
+  `
+  return db.query(query, [userId]);
+}
