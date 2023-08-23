@@ -34,20 +34,38 @@ export async function likePost(req,res) {
   }
 }
 
-export async function getPosts(req,res) {
-  try{
-    return res.status(200).send(await func.sendPosts())
-  } catch(err){
+export async function getPosts(req, res) {
+  const { userId } = res.locals.user;
+
+  try {
+    const result = await func.sendPosts(userId);
+    const followStatus = await func.followingStatusDB(userId);
+
+    let response = [];
+    let status = "not following";
+
+    if (followStatus.rows.length > 0) {
+      const followedIds = new Set(followStatus.rows.map(row => row.followedId));
+      response = result.rows.filter(post => followedIds.has(post.userId));
+      if (response.length === 0) {
+        status = "following";
+      }
+    }
+
+    return res.status(200).send({ rows: response, status });
+  } catch (err) {
     res.status(500).send(err.message);
   }
 }
 
+
 export async function getPostsById(req, res) {
   const { id } = req.params
-  const userId = res.locals.user.id;
+  const { userId } = res.locals.user;
   try {
     const posts = await func.getUserPosts(id)
-    const userInfo = await func.getUserInfo(id, userId)
+    const userInfo = await func.getUserInfo(id, userId);
+
     const obj = {
       name: userInfo.rows[0].name,
       image: userInfo.rows[0].image,
