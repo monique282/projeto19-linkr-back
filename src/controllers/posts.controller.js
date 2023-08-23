@@ -44,12 +44,15 @@ export async function getPosts(req,res) {
 
 export async function getPostsById(req, res) {
   const { id } = req.params
+  const userId = res.locals.user.id;
   try {
     const posts = await func.getUserPosts(id)
-    const userInfo = await func.getUserInfo(id)
+    const userInfo = await func.getUserInfo(id, userId)
     const obj = {
       name: userInfo.rows[0].name,
       image: userInfo.rows[0].image,
+      id: userInfo.rows[0].id,
+      statusFollow: userInfo.rows[0].status,
       posts: posts.rows
     }
     res.status(200).send(obj)
