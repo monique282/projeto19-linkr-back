@@ -47,26 +47,25 @@ export async function getPosts(req, res) {
     const userPosts = await func.sendPosts(userId);
     const reposts = await func.sendReposts(userId);
     const followStatus = await func.followingStatusDB(userId);
-    let response = [];
     let status = "not following";
-
-    response.push(
-      ...userPosts,
-      ...reposts
-    );
-    
-    console.log(userPosts)
+    let response = [];
+    const array2 = result.rows.filter((post) => post.userId === userId);
+    const array4 = reposts.rows.filter((post) => post.repostedId === userId);
+    response = [...array2, ...array4];
 
     if (followStatus.followedIds.length > 0) {
       const followedIds = new Set(followStatus.followedIds);
-      response = response.filter(
-        post => followedIds.has(post.userId) || post.repostedId === userId
+      const array1 = result.rows.filter((post) => followedIds.has(post.userId));
+      const array3 = reposts.rows.filter(
+        (post) => followedIds.has(post.repostedId) || post.repostedId === userId
       );
-      response.sort((a, b) => b.createdAt - a.createdAt);
+      response = [...array1, ...array3];
+
       if (response.length === 0) {
         status = "following";
       }
     }
+    response.sort((a, b) => b.createdAt - a.createdAt);
 
     return res.status(200).send({
       rows: response,
@@ -78,7 +77,6 @@ export async function getPosts(req, res) {
     res.status(500).send(err.message);
   }
 }
-
 
 export async function getPostsById(req, res) {
   const { id } = req.params;
@@ -93,8 +91,8 @@ export async function getPostsById(req, res) {
     response.push(...reposts.rows);
     response.sort((a, b) => b.createdAt - a.createdAt);
 
-    if ( userId === Number(id) ) isUser = true;
-    console.log(isUser)
+    if (userId === Number(id)) isUser = true;
+    console.log(isUser);
 
     const obj = {
       name: userInfo.rows[0].name,
