@@ -6,15 +6,15 @@ export async function selectSessionsByToken(token) {
 
 export async function createPost(url, content, userId) {
   return await db.query(
-    `INSERT INTO posts (url, content, "userId", "createdAt") VALUES ($1, $2, $3, to_timestamp($4)) RETURNING posts.id;`,
-    [url, content, userId, Date.now() / 1000]
+    `INSERT INTO posts (url, content, "userId", "createdAt") VALUES ($1, $2, $3, $4) RETURNING posts.id;`,
+    [url, content, userId, Math.round(Date.now() / 1000)]
   );
 }
 
 export async function createRepost(id, userId) {
   return db.query(
-    `INSERT INTO reposts ("postId", "userId", "createdAt") VALUES ($1, $2, to_timestamp($3));`,
-    [id, userId, Date.now()]
+    `INSERT INTO reposts ("postId", "userId", "createdAt") VALUES ($1, $2, $3);`,
+    [id, userId, Math.round(Date.now() / 1000)]
   );
 }
 
