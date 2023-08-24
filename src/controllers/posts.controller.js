@@ -45,22 +45,27 @@ export async function getPosts(req, res) {
 
   try {
     const result = await func.sendPosts(userId);
-    const reposts = await func.sendReposts();
+    const reposts = await func.sendReposts(userId);
     const followStatus = await func.followingStatusDB(userId);
-    let response = [];
     let status = "not following";
+    let response = [];
+    const array2 = result.filter((post) => post.userId === userId);
+    const array4 = reposts.filter((post) => post.repostedId === userId);
+    response = [...array2, ...array4];
 
     if (followStatus.followedIds.length > 0) {
       const followedIds = new Set(followStatus.followedIds);
-      response = result.rows.filter((post) => followedIds.has(post.userId));
-      response.push(
-        ...reposts.rows.filter((post) => followedIds.has(post.repostedId))
+      const array1 = result.filter((post) => followedIds.has(post.userId));
+      const array3 = reposts.filter(
+        (post) => followedIds.has(post.repostedId)
       );
-      response.sort((a, b) => b.createdAt - a.createdAt);
+      response = [...response ,...array1, ...array3];
+
       if (response.length === 0) {
         status = "following";
       }
     }
+    response.sort((a, b) => b.createdAt - a.createdAt);
 
     return res.status(200).send({
       rows: response,
@@ -78,6 +83,7 @@ export async function getPostsById(req, res) {
   const { userId } = res.locals.user;
   try {
     let response = [];
+    let isUser = false;
     const posts = await func.getUserPosts(id);
     response.push(...posts.rows);
     const userInfo = await func.getUserInfo(id, userId);
@@ -85,11 +91,15 @@ export async function getPostsById(req, res) {
     response.push(...reposts.rows);
     response.sort((a, b) => b.createdAt - a.createdAt);
 
+    if (userId === Number(id)) isUser = true;
+    console.log(isUser);
+
     const obj = {
       name: userInfo.rows[0].name,
       image: userInfo.rows[0].image,
       id: userInfo.rows[0].id,
       statusFollow: userInfo.rows[0].status,
+      isUser,
       posts: response,
     };
     res.status(200).send(obj);
