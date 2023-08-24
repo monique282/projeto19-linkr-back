@@ -92,6 +92,7 @@ export async function getPostsById(req, res) {
     response.sort((a, b) => b.createdAt - a.createdAt);
 
     if ( userId === Number(id) ) isUser = true;
+    console.log(isUser)
 
     const obj = {
       name: userInfo.rows[0].name,
