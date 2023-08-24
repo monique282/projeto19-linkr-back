@@ -53,7 +53,7 @@ LEFT JOIN likes ON likes."postId" = posts.id
 LEFT JOIN comments ON comments."postId" = posts.id
 GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
 ORDER BY posts.id DESC
-LIMIT 20;`);
+LIMIT 10;`);
 }
 
 export async function insertHashtags(values) {
@@ -86,7 +86,7 @@ LEFT JOIN comments ON comments."postId" = posts.id
 WHERE users.id = $1
 GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
 ORDER BY posts.id DESC
-LIMIT 20;
+LIMIT 10;
   `,
     [id]
   );
