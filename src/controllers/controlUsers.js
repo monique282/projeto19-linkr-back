@@ -11,6 +11,7 @@ import {
     postRequisitionRegisterSend, postRequisitionValidateToken, situationFollowDB, unfollowDB
 } from '../repositories/repositoryUsers.js';
 import db from '../database/database.connection.js';
+import { followingStatusDB } from '../repositories/posts.repository.js';
 
 // essa função aqui serve para enviar um post para criar um cadastro
 export async function registerPost(req, res) {
@@ -135,11 +136,14 @@ export async function usersSessionslete(req, res) {
 export async function performSearchNoServerGet(req, res) {
     // pegando as informação digitadas na barra de pesquisa
     const { name } = req.params;
+    const { userId } = res.locals.user;
 
     try {
 
         // fazendo a requisição para buscar o usuario na tabela 
         const result = await getRequisitionUser(name);
+
+        const follows = await followingStatusDB(userId);
 
         // se tudo der certo
         const usersRequest = result.rows;
