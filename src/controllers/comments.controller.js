@@ -10,8 +10,8 @@ export async function createComment(req, res) {
   try {
     await insertComment(id, userId, content);
     
-    const promise = await selectCommentsById(userId, id);
-    res.status(201).send(promise.rows);
+    // const promise = await selectCommentsById(userId, id);
+    res.status(201).send("Criado!");
   } catch (err) {
     res.status(500).send(err.message);
   }
