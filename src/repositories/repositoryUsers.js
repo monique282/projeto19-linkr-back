@@ -1,4 +1,5 @@
 import db from "../database/database.connection.js";
+import { followingStatusDB } from "./posts.repository.js";
 
 // verificando se o email ja esta cadastrado
 export async function postRequisitionRegisterEmail(email) {
@@ -35,28 +36,53 @@ export async function deleteSendSessionsToken(token) {
 };
 
 // verificando os usuarios na tabela 
-export async function getRequisitionUser(name) {
-    const ExistingUsersResult = await db.query(`SELECT * FROM users WHERE LOWER(name) LIKE LOWER($1 || '%');`, [name]);
-    return ExistingUsersResult;
+export async function getRequisitionUser(name, userId) {
+    // pegando todos os usuarios que tem os que eu digitei
+    const existingUsersResult = await db.query(`SELECT * FROM users WHERE LOWER(name) LIKE LOWER($1 || '%');`, [name]);
+
+    // apartir do meu usuario logado pelo meu id eu vou ver quem eu sigo
+    const followedStatus = await followingStatusDB(userId);
+
+    // pegando os usuarios que eu sigo pelo id
+    const followedIds = followedStatus.followedIds;
+
+    // aqui ele vai fazer um map somente dos usuarios que eu sigo
+    const usersWithFollowStatus = existingUsersResult.rows.map(user => {
+        const follow = followedIds.includes(user.id);
+        return { ...user, follow };
+    });
+
+    // fazendo um filtro os usuarios que eu sigo
+    const usersYouFollow = usersWithFollowStatus.filter(user => user.follow);
+
+    // aqui são os que eu não sigo
+    const usersYouDontFollow = usersWithFollowStatus.filter(user => !user.follow);
+
+    // juntando os que eu sigo com os que eu não sigo
+    const orderedUsers = [...usersYouFollow, ...usersYouDontFollow];
+    const result = orderedUsers;
+
+    return result;
 };
 
-export async function situationFollowDB ( followingId, followedId ) {
+
+export async function situationFollowDB(followingId, followedId) {
     const query = `
         SELECT id FROM follows WHERE "followingId" = $1 AND "followedId" = $2;
     `
-    return db.query(query, [ followingId, followedId ]);
+    return db.query(query, [followingId, followedId]);
 }
 
-export async function followDB ( followingId, followedId ) {
-    const query =`
+export async function followDB(followingId, followedId) {
+    const query = `
         INSERT INTO follows ( "followingId", "followedId" ) VALUES ( $1, $2 );
     `
-    return db.query( query, [followingId, followedId])
+    return db.query(query, [followingId, followedId])
 }
 
-export async function unfollowDB ( followingId, followedId ) {
+export async function unfollowDB(followingId, followedId) {
     const query = `
         DELETE FROM follows WHERE "followingId" = $1 AND "followedId" = $2 RETURNING 'OI';
     `
-    return db.query(query , [followingId, followedId])
+    return db.query(query, [followingId, followedId])
 }

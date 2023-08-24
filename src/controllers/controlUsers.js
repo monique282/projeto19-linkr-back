@@ -141,12 +141,13 @@ export async function performSearchNoServerGet(req, res) {
     try {
 
         // fazendo a requisição para buscar o usuario na tabela 
-        const result = await getRequisitionUser(name);
+        const result = await getRequisitionUser(name, userId);
 
-        const follows = await followingStatusDB(userId);
+        //const follows = await followingStatusDB(userId);
 
         // se tudo der certo
-        const usersRequest = result.rows;
+        const usersRequest = result;
+    
         res.send(usersRequest);
 
     } catch (erro) {
