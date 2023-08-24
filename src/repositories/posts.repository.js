@@ -134,8 +134,13 @@ export async function updatePost(content, id) {
 
 export async function followingStatusDB (userId){
   const query =`
-    SELECT "followedId" FROM follows
-      WHERE "followingId" = $1;
+  SELECT 
+    COALESCE(ARRAY_AGG(users.id), ARRAY[]::INTEGER[]) AS "followedIds",
+    COALESCE(ARRAY_AGG(users.name), ARRAY[]::TEXT[]) AS "followedNames"
+  FROM follows
+  JOIN users ON users.id = follows."followedId"
+  WHERE "followingId" = $1;
   `
-  return db.query(query, [userId]);
+  const result = await db.query(query, [userId]);
+  return result.rows[0];
 }
