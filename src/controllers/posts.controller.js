@@ -59,7 +59,7 @@ export async function getPosts(req, res) {
       const array3 = reposts.filter(
         (post) => followedIds.has(post.repostedId)
       );
-      response = [...array1, ...array3];
+      response = [...response ,...array1, ...array3];
 
       if (response.length === 0) {
         status = "following";
