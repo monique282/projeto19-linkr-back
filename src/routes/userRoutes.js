@@ -9,7 +9,7 @@ const userRouter = Router();
 userRouter.post("/signup", validateSchema(registerTable), registerPost);
 userRouter.post("/signin", validateSchema(loginTable), loginPost);
 userRouter.delete("/logout", usersSessionslete);
-userRouter.get("/search/:name", performSearchNoServerGet);
+userRouter.get("/search/:name", validateAuth, performSearchNoServerGet);
 userRouter.post("/follows", validateAuth, validateSchema(followSchema), follow);
 
 export default userRouter;

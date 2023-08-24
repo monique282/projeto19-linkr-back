@@ -40,23 +40,25 @@ export async function getPosts(req, res) {
   try {
     const result = await func.sendPosts(userId);
     const followStatus = await func.followingStatusDB(userId);
+    console.log(followStatus)
 
     let response = [];
     let status = "not following";
 
-    if (followStatus.rows.length > 0) {
-      const followedIds = new Set(followStatus.rows.map(row => row.followedId));
+    if (followStatus.followedIds.length > 0) {
+      const followedIds = new Set(followStatus.followedIds);
       response = result.rows.filter(post => followedIds.has(post.userId));
       if (response.length === 0) {
         status = "following";
       }
     }
 
-    return res.status(200).send({ rows: response, status });
+    return res.status(200).send({ rows: response, status, followedNames: followStatus.followedNames, followedIds: followStatus.followedIds });
   } catch (err) {
     res.status(500).send(err.message);
   }
 }
+
 
 
 export async function getPostsById(req, res) {
