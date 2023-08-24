@@ -54,6 +54,8 @@ export async function getPosts(req, res) {
       ...userPosts,
       ...reposts
     );
+    
+    console.log(userPosts)
 
     if (followStatus.followedIds.length > 0) {
       const followedIds = new Set(followStatus.followedIds);
