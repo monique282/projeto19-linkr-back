@@ -6,8 +6,22 @@ export async function selectSessionsByToken(token) {
 
 export async function createPost(url, content, userId) {
   return await db.query(
-    `INSERT INTO posts (url, content, "userId") VALUES ($1, $2, $3) RETURNING posts.id;`,
-    [url, content, userId]
+    `INSERT INTO posts (url, content, "userId", "createdAt") VALUES ($1, $2, $3, to_timestamp($4)) RETURNING posts.id;`,
+    [url, content, userId, Date.now() / 1000]
+  );
+}
+
+export async function createRepost(id, userId) {
+  return db.query(
+    `INSERT INTO reposts ("postId", "userId", "createdAt") VALUES ($1, $2, to_timestamp($3));`,
+    [id, userId, Date.now()]
+  );
+}
+
+export async function validateRepost(id, userId) {
+  return db.query(
+    `SELECT * FROM reposts WHERE "postId" = $1 AND "userId" = $2;`,
+    [id, userId]
   );
 }
 
@@ -38,22 +52,79 @@ export async function handleLike(postId, userId) {
 
 export async function sendPosts() {
   return await db.query(`SELECT 
-  users.id AS "userId",
-  users.name AS name,
-  users.image AS image,
   posts.id AS "postId",
   posts.content AS content,
   posts.url AS url,
-  COUNT(likes."userId") AS "numberLikes",
-  COUNT(comments."postId") AS "numberComments",
+  posts."createdAt" AS "createdAt",
+  users.id AS "userId",
+  users.name AS name,
+  users.image AS image,
+  COALESCE(likes."numberLikes", 0) AS "numberLikes",
+  COALESCE(comments."numberComments", 0) AS "numberComments",
+  COALESCE(reposts."numberReposts", 0) AS "numberReposts",
   ARRAY_AGG(likes."userId") AS "likedUserIds"
 FROM posts
-JOIN users ON posts."userId" = users.id
-LEFT JOIN likes ON likes."postId" = posts.id
-LEFT JOIN comments ON comments."postId" = posts.id
-GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
+LEFT JOIN users ON users.id = posts."userId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+  FROM likes
+  GROUP BY "postId", "userId"
+) AS likes ON posts.id = likes."postId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberComments"
+  FROM comments
+  GROUP BY "postId"
+) AS comments ON posts.id = comments."postId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberReposts"
+  FROM reposts
+  GROUP BY "postId"
+) AS reposts ON posts.id = reposts."postId"
+GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, likes."numberLikes", comments."numberComments", reposts."numberReposts"
 ORDER BY posts.id DESC
-LIMIT 20;`);
+LIMIT 10;`);
+}
+
+export async function sendReposts() {
+  return db.query(`
+SELECT 
+  posts.id AS "postId",
+  posts.content AS content,
+  posts.url AS url,
+  users.id AS "userId",
+  users.name AS name,
+  users.image AS image,
+  repost_user.name AS "repostedBy",
+  reposts."userId" AS "repostedId",
+  reposts."createdAt" AS "createdAt",
+  COALESCE(likes."numberLikes", 0) AS "numberLikes",
+  COALESCE(comments."numberComments", 0) AS "numberComments",
+  COALESCE(reposts."numberReposts", 0) AS "numberReposts",
+  ARRAY_AGG(likes."userId") AS "likedUserIds"
+FROM posts
+LEFT JOIN users ON users.id = posts."userId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+  FROM likes
+  GROUP BY "postId", "userId"
+) AS likes ON posts.id = likes."postId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberComments"
+  FROM comments
+  GROUP BY "postId"
+) AS comments ON posts.id = comments."postId"
+LEFT JOIN (
+  SELECT "postId", COUNT(*) AS "numberReposts", "userId", "createdAt"
+  FROM reposts
+  GROUP BY "postId", "userId", "createdAt"
+) AS reposts ON posts.id = reposts."postId"
+LEFT JOIN users AS repost_user ON reposts."userId" = repost_user.id
+GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
+likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
+ORDER BY posts.id DESC
+LIMIT 10;
+
+  `);
 }
 
 export async function insertHashtags(values) {
@@ -70,27 +141,87 @@ export async function insertHashtags(values) {
 export async function getUserPosts(id) {
   const promise = db.query(
     `SELECT 
-  users.id AS "userId",
-  users.name AS name,
-  users.image AS image,
-  posts.id AS "postId",
-  posts.content AS content,
-  posts.url AS url,
-  COUNT(likes."userId") AS "numberLikes",
-  COUNT(comments."postId") AS "numberComments",
-  ARRAY_AGG(likes."userId") AS "likedUserIds"
-FROM posts
-JOIN users ON posts."userId" = users.id
-LEFT JOIN likes ON likes."postId" = posts.id
-LEFT JOIN comments ON comments."postId" = posts.id
-WHERE users.id = $1
-GROUP BY users.id, users.name, users.image, posts.id, posts.content, posts.url
-ORDER BY posts.id DESC
-LIMIT 20;
+    posts.id AS "postId",
+    posts.content AS content,
+    posts.url AS url,
+    posts."createdAt" AS "createdAt",
+    users.id AS "userId",
+    users.name AS name,
+    users.image AS image,
+    COALESCE(likes."numberLikes", 0) AS "numberLikes",
+    COALESCE(comments."numberComments", 0) AS "numberComments",
+    COALESCE(reposts."numberReposts", 0) AS "numberReposts",
+    ARRAY_AGG(likes."userId") AS "likedUserIds"
+  FROM posts
+  LEFT JOIN users ON users.id = posts."userId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+    FROM likes
+    GROUP BY "postId", "userId"
+  ) AS likes ON posts.id = likes."postId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberComments"
+    FROM comments
+    GROUP BY "postId"
+  ) AS comments ON posts.id = comments."postId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberReposts"
+    FROM reposts
+    GROUP BY "postId"
+  ) AS reposts ON posts.id = reposts."postId"
+  WHERE users.id = $1
+  GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, likes."numberLikes", comments."numberComments", reposts."numberReposts"
+  ORDER BY posts.id DESC
+  LIMIT 10;
   `,
     [id]
   );
   return promise;
+}
+
+export async function getUserReposts(id) {
+  return db.query(
+    `
+    SELECT 
+    posts.id AS "postId",
+    posts.content AS content,
+    posts.url AS url,
+    users.id AS "userId",
+    users.name AS name,
+    users.image AS image,
+    repost_user.name AS "repostedBy",
+    reposts."userId" AS "repostedId",
+    reposts."createdAt" AS "createdAt",
+    COALESCE(likes."numberLikes", 0) AS "numberLikes",
+    COALESCE(comments."numberComments", 0) AS "numberComments",
+    COALESCE(reposts."numberReposts", 0) AS "numberReposts",
+    ARRAY_AGG(likes."userId") AS "likedUserIds"
+  FROM posts
+  LEFT JOIN users ON users.id = posts."userId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+    FROM likes
+    GROUP BY "postId", "userId"
+  ) AS likes ON posts.id = likes."postId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberComments"
+    FROM comments
+    GROUP BY "postId"
+  ) AS comments ON posts.id = comments."postId"
+  LEFT JOIN (
+    SELECT "postId", COUNT(*) AS "numberReposts", "userId", "createdAt"
+    FROM reposts
+    GROUP BY "postId", "userId", "createdAt"
+  ) AS reposts ON posts.id = reposts."postId"
+  LEFT JOIN users AS repost_user ON reposts."userId" = repost_user.id
+  WHERE reposts."userId" = $1
+  GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
+  likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
+  ORDER BY posts.id DESC
+  LIMIT 10;
+  `,
+    [id]
+  );
 }
 
 export async function getUserInfo(id, userId) {
@@ -112,35 +243,40 @@ export async function getUserInfo(id, userId) {
 
 // verificando se o post existe
 export async function getRequisitionPostId(id) {
-  const idPostResult = await db.query('SELECT * FROM posts WHERE id = $1;', [id]);
+  const idPostResult = await db.query("SELECT * FROM posts WHERE id = $1;", [
+    id,
+  ]);
   return idPostResult;
-};
+}
 
 // apagando o post
 export async function deleteSendPostId(id) {
   const serveSend = await db.query(`DELETE FROM posts WHERE id = $1;`, [id]);
   return serveSend;
-};
+}
 
 export async function deleteHashtags(id) {
-  const promise = db.query(`DELETE FROM hashtags WHERE "postId" = $1;`, [id])
-  return promise
+  const promise = db.query(`DELETE FROM hashtags WHERE "postId" = $1;`, [id]);
+  return promise;
 }
 
 export async function updatePost(content, id) {
-  const promise = db.query(`UPDATE posts SET content = $1 WHERE id = $2;`, [content, id]);
-  return promise
+  const promise = db.query(`UPDATE posts SET content = $1 WHERE id = $2;`, [
+    content,
+    id,
+  ]);
+  return promise;
 }
 
-export async function followingStatusDB (userId){
-  const query =`
+export async function followingStatusDB(userId) {
+  const query = `
   SELECT 
     COALESCE(ARRAY_AGG(users.id), ARRAY[]::INTEGER[]) AS "followedIds",
     COALESCE(ARRAY_AGG(users.name), ARRAY[]::TEXT[]) AS "followedNames"
   FROM follows
   JOIN users ON users.id = follows."followedId"
   WHERE "followingId" = $1;
-  `
+  `;
   const result = await db.query(query, [userId]);
   return result.rows[0];
 }
