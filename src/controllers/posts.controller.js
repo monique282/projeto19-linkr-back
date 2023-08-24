@@ -44,20 +44,20 @@ export async function getPosts(req, res) {
   const { userId } = res.locals.user;
 
   try {
-    const userPosts = await func.sendPosts(userId);
+    const result = await func.sendPosts(userId);
     const reposts = await func.sendReposts(userId);
     const followStatus = await func.followingStatusDB(userId);
     let status = "not following";
     let response = [];
-    const array2 = result.rows.filter((post) => post.userId === userId);
-    const array4 = reposts.rows.filter((post) => post.repostedId === userId);
+    const array2 = result.filter((post) => post.userId === userId);
+    const array4 = reposts.filter((post) => post.repostedId === userId);
     response = [...array2, ...array4];
 
     if (followStatus.followedIds.length > 0) {
       const followedIds = new Set(followStatus.followedIds);
-      const array1 = result.rows.filter((post) => followedIds.has(post.userId));
-      const array3 = reposts.rows.filter(
-        (post) => followedIds.has(post.repostedId) || post.repostedId === userId
+      const array1 = result.filter((post) => followedIds.has(post.userId));
+      const array3 = reposts.filter(
+        (post) => followedIds.has(post.repostedId)
       );
       response = [...array1, ...array3];
 
