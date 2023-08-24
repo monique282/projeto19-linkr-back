@@ -1,6 +1,6 @@
 import {
-    insertComment,
-    selectCommentsById,
+  insertComment,
+  selectCommentsById,
 } from "../repositories/comments.repository.js";
 
 export async function createComment(req, res) {
@@ -9,7 +9,9 @@ export async function createComment(req, res) {
   const { content } = req.body;
   try {
     await insertComment(id, userId, content);
-    res.status(201).send("Comentário realizado!");
+    
+    const promise = await selectCommentsById(userId, id);
+    res.status(201).send(promise.rows);
   } catch (err) {
     res.status(500).send(err.message);
   }
