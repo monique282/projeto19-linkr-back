@@ -52,14 +52,12 @@ export async function getPosts(req, res) {
     const array2 = result.filter((post) => post.userId === userId);
     const array4 = reposts.filter((post) => post.repostedId === userId);
     response = [...array2, ...array4];
+    const followedIds = followStatus.followedIds;
 
     if (followStatus.followedIds.length > 0) {
-      const followedIds = new Set(followStatus.followedIds);
-      const array1 = result.filter((post) => followedIds.has(post.userId));
-      const array3 = reposts.filter(
-        (post) => followedIds.has(post.repostedId)
-      );
-      response = [...response ,...array1, ...array3];
+      const array1 = result.filter((post) => followedIds.includes(post.userId));
+      const array3 = reposts.filter((post) => followedIds.includes(post.repostedId));
+      response = [...response, ...array1, ...array3];
 
       if (response.length === 0) {
         status = "following";
