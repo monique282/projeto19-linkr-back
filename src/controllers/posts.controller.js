@@ -42,7 +42,6 @@ export async function likePost(req, res) {
 
 export async function getPosts(req, res) {
   const { userId } = res.locals.user;
-
   try {
     const result = await func.sendPosts(userId);
     const reposts = await func.sendReposts(userId);
@@ -89,7 +88,7 @@ export async function getPostsScroll(req, res) {
     const array4 = reposts.filter((post) => post.repostedId === userId);
     response = [...array2, ...array4];
     const followedIds = followStatus.followedIds;
-
+    
     if (followStatus.followedIds.length > 0) {
       const array1 = result.filter((post) => followedIds.includes(post.userId));
       const array3 = reposts.filter((post) => followedIds.includes(post.repostedId));
@@ -100,9 +99,9 @@ export async function getPostsScroll(req, res) {
       }
     }
     response.sort((a, b) => b.createdAt - a.createdAt);
-    const slicedResponse = response.slice(0, 10)
+
     return res.status(200).send({
-      rows: slicedResponse,
+      rows: response.slice(0, 10),
       status,
       followedNames: followStatus.followedNames,
       followedIds: followStatus.followedIds,
@@ -145,7 +144,6 @@ export async function getPostsByIdScroll(req, res) {
   const { id } = req.params;
   const { userId } = res.locals.user;
   const {lastPost} = req.query
-  console.log(lastPost)
   try {
     let response = [];
     let isUser = false;
@@ -206,7 +204,6 @@ export async function editPostById(req, res) {
         hashtag.toLowerCase(),
         id,
       ]);
-      console.log(hashtagsValues);
       await func.insertHashtags(hashtagsValues);
     }
 
