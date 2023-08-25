@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.16 (Ubuntu 12.16-0ubuntu0.20.04.1)
+-- Dumped from database version 12.16 (Ubuntu 12.16-1.pgdg20.04+1)
+-- Dumped by pg_dump version 12.16 (Ubuntu 12.16-1.pgdg20.04+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -153,7 +153,8 @@ CREATE TABLE public.posts (
     id integer NOT NULL,
     url text NOT NULL,
     content text,
-    "userId" integer
+    "userId" integer,
+    "createdAt" integer NOT NULL
 );
 
 
@@ -184,7 +185,8 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 CREATE TABLE public.reposts (
     id integer NOT NULL,
     "postId" integer,
-    "userId" integer
+    "userId" integer,
+    "createdAt" integer NOT NULL
 );
 
 
