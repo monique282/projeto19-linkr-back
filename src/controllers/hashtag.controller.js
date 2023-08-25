@@ -20,7 +20,6 @@ export async function getOneHashtag ( req, res ) {
     try {
 
         const hashtagPosts = await getOneHashtagDB(hashtag);
-        console.log(hashtagPosts)
 
         if( hashtagPosts.rowCount === 0 ) return res.status(404).send({message: "Nenhum post com esta hashtag"});
 

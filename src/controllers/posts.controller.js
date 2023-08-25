@@ -49,6 +49,49 @@ export async function getPosts(req, res) {
     const followStatus = await func.followingStatusDB(userId);
     let status = "not following";
     let response = [];
+    let slicedResponse = [];
+    const array2 = result.filter((post) => post.userId === userId);
+    const array4 = reposts.filter((post) => post.repostedId === userId);
+    response = [...array2, ...array4];
+    let array1 =[]
+    if (followStatus.followedIds.length > 0) {
+      const followedIds = new Set(followStatus.followedIds);
+      array1 = result.filter((post) => followedIds.has(post.userId));
+      const array3 = reposts.filter(
+        (post) => followedIds.has(post.repostedId)
+      );
+      response = [...response ,...array1, ...array3];
+      if (response.length === 0) {
+        status = "following";
+      }
+    }
+    response.sort((a, b) => b.createdAt - a.createdAt);
+    slicedResponse = response.slice(0, 10)
+    return res.status(200).send({
+      test: {result, array1, followStatus},
+      rows: slicedResponse,
+      status,
+      followedNames: followStatus.followedNames,
+      followedIds: followStatus.followedIds,
+    });
+  } 
+  catch (err) {
+    res.status(500).send(err.message);
+    console.log(err)
+  }
+}
+
+export async function getPostsScroll(req, res) {
+  const { userId } = res.locals.user;
+  const {createdAt} = req.query
+
+  try {
+    const result = await func.sendPostsScroll(userId, createdAt);
+    const reposts = await func.sendRepostsScroll(userId, createdAt);
+    const followStatus = await func.followingStatusDB(userId);
+    let status = "not following";
+    let response = [];
+    let slicedResponse = [];
     const array2 = result.filter((post) => post.userId === userId);
     const array4 = reposts.filter((post) => post.repostedId === userId);
     response = [...array2, ...array4];
@@ -60,24 +103,23 @@ export async function getPosts(req, res) {
         (post) => followedIds.has(post.repostedId)
       );
       response = [...response ,...array1, ...array3];
-
       if (response.length === 0) {
         status = "following";
       }
     }
     response.sort((a, b) => b.createdAt - a.createdAt);
-
+    slicedResponse = response.slice(0, 10)
     return res.status(200).send({
-      rows: response,
+      rows: slicedResponse,
       status,
       followedNames: followStatus.followedNames,
       followedIds: followStatus.followedIds,
     });
   } catch (err) {
     res.status(500).send(err.message);
+    console.log(err)
   }
 }
-
 export async function getPostsById(req, res) {
   const { id } = req.params;
   const { userId } = res.locals.user;
@@ -92,7 +134,6 @@ export async function getPostsById(req, res) {
     response.sort((a, b) => b.createdAt - a.createdAt);
 
     if (userId === Number(id)) isUser = true;
-    console.log(isUser);
 
     const obj = {
       name: userInfo.rows[0].name,
@@ -142,7 +183,6 @@ export async function editPostById(req, res) {
         hashtag.toLowerCase(),
         id,
       ]);
-      console.log(hashtagsValues);
       await func.insertHashtags(hashtagsValues);
     }
 

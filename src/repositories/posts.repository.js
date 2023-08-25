@@ -87,7 +87,7 @@ export async function sendPosts(userId) {
       SELECT "followedId" FROM follows WHERE "followingId" = $1
     )
     GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, likes."numberLikes", comments."numberComments", reposts."numberReposts"
-    ORDER BY posts.id DESC
+    ORDER BY posts."createdAt" DESC
     LIMIT 10;
   `, [userId]);
   return result.rows;
@@ -130,12 +130,97 @@ export async function sendReposts(userId) {
     WHERE reposts."userId" = $1 OR reposts."userId" = $1
     GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
     likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
-    ORDER BY posts.id DESC
+    ORDER BY reposts."createdAt" DESC
     LIMIT 10;
   `, [userId]);
   return result.rows
 }
 
+export async function sendPostsScroll(userId) {
+  const result = await db.query(`
+    SELECT 
+      posts.id AS "postId",
+      posts.content AS content,
+      posts.url AS url,
+      posts."createdAt" AS "createdAt",
+      users.id AS "userId",
+      users.name AS name,
+      users.image AS image,
+      COALESCE(likes."numberLikes", 0) AS "numberLikes",
+      COALESCE(comments."numberComments", 0) AS "numberComments",
+      COALESCE(reposts."numberReposts", 0) AS "numberReposts",
+      ARRAY_AGG(likes."userId") AS "likedUserIds"
+    FROM posts
+    LEFT JOIN users ON users.id = posts."userId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+      FROM likes
+      GROUP BY "postId", "userId"
+    ) AS likes ON posts.id = likes."postId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberComments"
+      FROM comments
+      GROUP BY "postId"
+    ) AS comments ON posts.id = comments."postId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberReposts"
+      FROM reposts
+      GROUP BY "postId"
+    ) AS reposts ON posts.id = reposts."postId"
+    WHERE posts."userId" = $1 OR posts.id IN (
+      SELECT "postId" FROM reposts WHERE "userId" = $1
+    ) OR posts."userId" IN (
+      SELECT "followedId" FROM follows WHERE "followingId" = $1
+    )  
+    GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, likes."numberLikes", comments."numberComments", reposts."numberReposts"
+    ORDER BY posts."createdAt" DESC
+    LIMIT 10;
+  `, [userId]);
+  return result.rows;
+}
+
+export async function sendRepostsScroll(userId) {
+  const result = await db.query(`
+    SELECT 
+      posts.id AS "postId",
+      posts.content AS content,
+      posts.url AS url,
+      users.id AS "userId",
+      users.name AS name,
+      users.image AS image,
+      repost_user.name AS "repostedBy",
+      reposts."userId" AS "repostedId",
+      reposts."createdAt" AS "createdAt",
+      COALESCE(likes."numberLikes", 0) AS "numberLikes",
+      COALESCE(comments."numberComments", 0) AS "numberComments",
+      COALESCE(reposts."numberReposts", 0) AS "numberReposts",
+      ARRAY_AGG(likes."userId") AS "likedUserIds"
+    FROM posts
+    LEFT JOIN users ON users.id = posts."userId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberLikes", "userId"
+      FROM likes
+      GROUP BY "postId", "userId"
+    ) AS likes ON posts.id = likes."postId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberComments"
+      FROM comments
+      GROUP BY "postId"
+    ) AS comments ON posts.id = comments."postId"
+    LEFT JOIN (
+      SELECT "postId", COUNT(*) AS "numberReposts", "userId", "createdAt"
+      FROM reposts
+      GROUP BY "postId", "userId", "createdAt"
+    ) AS reposts ON posts.id = reposts."postId"
+    LEFT JOIN users AS repost_user ON reposts."userId" = repost_user.id
+    WHERE reposts."userId" = $1 OR reposts."userId" = $1
+    GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
+    likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
+    ORDER BY reposts."createdAt" DESC
+    LIMIT 10;
+  `, [userId]);
+  return result.rows
+}
 
 export async function insertHashtags(values) {
   const query = `
