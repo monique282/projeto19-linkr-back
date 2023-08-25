@@ -81,15 +81,10 @@ export async function sendPosts(userId) {
       FROM reposts
       GROUP BY "postId"
     ) AS reposts ON posts.id = reposts."postId"
-    WHERE posts."userId" = $1 OR posts.id IN (
-      SELECT "postId" FROM reposts WHERE "userId" = $1
-    ) OR posts."userId" IN (
-      SELECT "followedId" FROM follows WHERE "followingId" = $1
-    )
     GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, likes."numberLikes", comments."numberComments", reposts."numberReposts"
     ORDER BY posts.id DESC
     LIMIT 10;
-  `, [userId]);
+  `);
   return result.rows;
 }
 
@@ -127,15 +122,13 @@ export async function sendReposts(userId) {
       GROUP BY "postId", "userId", "createdAt"
     ) AS reposts ON posts.id = reposts."postId"
     LEFT JOIN users AS repost_user ON reposts."userId" = repost_user.id
-    WHERE reposts."userId" = $1 OR reposts."userId" = $1
     GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
     likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
     ORDER BY posts.id DESC
     LIMIT 10;
-  `, [userId]);
-  return result.rows
+  `);
+  return result.rows;
 }
-
 
 export async function insertHashtags(values) {
   const query = `
