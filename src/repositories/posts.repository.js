@@ -385,7 +385,7 @@ export async function getUserRepostsScroll(id, lastPost) {
     GROUP BY "postId", "userId", "createdAt"
   ) AS reposts ON posts.id = reposts."postId"
   LEFT JOIN users AS repost_user ON reposts."userId" = repost_user.id
-  WHERE reposts."userId" = $1 AND reposts."createdAt" = $2
+  WHERE reposts."userId" = $1 AND reposts."createdAt" < $2
   GROUP BY users.id, posts.id, posts.content, posts.url, posts."createdAt", users.name, users.image, reposts."createdAt", 
   likes."numberLikes", comments."numberComments", reposts."numberReposts", repost_user.name, reposts."userId"
   ORDER BY posts.id DESC
