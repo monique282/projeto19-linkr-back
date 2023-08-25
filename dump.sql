@@ -154,7 +154,7 @@ CREATE TABLE public.posts (
     url text NOT NULL,
     content text,
     "userId" integer,
-    "createdAt" integer
+    "createdAt" integer NOT NULL
 );
 
 
@@ -186,7 +186,7 @@ CREATE TABLE public.reposts (
     id integer NOT NULL,
     "postId" integer,
     "userId" integer,
-    "createdAt" integer
+    "createdAt" integer NOT NULL
 );
 
 
@@ -334,176 +334,104 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.comments VALUES (1, 4, 2, 'wow');
-INSERT INTO public.comments VALUES (2, 4, 2, 'f');
-INSERT INTO public.comments VALUES (3, 4, 1, 'ad');
-INSERT INTO public.comments VALUES (4, 4, 1, 'A');
-INSERT INTO public.comments VALUES (5, 4, 2, 'A');
-INSERT INTO public.comments VALUES (6, 3, 1, 'asdas');
-INSERT INTO public.comments VALUES (7, 4, 1, 'dasd');
-INSERT INTO public.comments VALUES (8, 5, 1, 'asd');
-INSERT INTO public.comments VALUES (9, 2, 2, 'ASDAS');
-INSERT INTO public.comments VALUES (10, 6, 1, 'dasd');
-INSERT INTO public.comments VALUES (11, 6, 1, 'dasds');
-INSERT INTO public.comments VALUES (12, 6, 1, 'aa');
-INSERT INTO public.comments VALUES (13, 6, 1, 'dd');
-INSERT INTO public.comments VALUES (14, 6, 1, 'a');
-INSERT INTO public.comments VALUES (15, 6, 1, 'a');
-INSERT INTO public.comments VALUES (16, 5, 1, 'a');
-INSERT INTO public.comments VALUES (17, 4, 2, 'a');
-INSERT INTO public.comments VALUES (18, 5, 1, 'a');
-INSERT INTO public.comments VALUES (19, 5, 1, 'b');
-INSERT INTO public.comments VALUES (20, 7, 1, 'sadasd');
-INSERT INTO public.comments VALUES (21, 7, 1, 'aa');
-INSERT INTO public.comments VALUES (22, 7, 1, 'aasa');
-INSERT INTO public.comments VALUES (23, 7, 1, 'a');
-INSERT INTO public.comments VALUES (24, 7, 1, 'as');
-INSERT INTO public.comments VALUES (25, 4, 1, 'a');
-INSERT INTO public.comments VALUES (26, 3, 1, 'a');
-INSERT INTO public.comments VALUES (27, 10, 1, 'a');
-INSERT INTO public.comments VALUES (28, 10, 1, 'b');
-INSERT INTO public.comments VALUES (29, 10, 1, 'c');
-INSERT INTO public.comments VALUES (30, 10, 1, 'D');
 
 
 --
 -- Data for Name: follows; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.follows VALUES (4, 1, 2);
-INSERT INTO public.follows VALUES (5, 2, 1);
 
 
 --
 -- Data for Name: hashtags; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.hashtags VALUES (1, 'pic', 2);
-INSERT INTO public.hashtags VALUES (2, 'pic', 3);
-INSERT INTO public.hashtags VALUES (3, 'pic', 4);
-INSERT INTO public.hashtags VALUES (4, 'lol', 5);
-INSERT INTO public.hashtags VALUES (5, 'test', 6);
-INSERT INTO public.hashtags VALUES (6, 'vsf', 7);
-INSERT INTO public.hashtags VALUES (7, 'vid', 8);
-INSERT INTO public.hashtags VALUES (8, 'o', 9);
-INSERT INTO public.hashtags VALUES (9, 'a', 10);
 
 
 --
 -- Data for Name: likes; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.likes VALUES (117, 4, 1);
-INSERT INTO public.likes VALUES (119, 3, 1);
-INSERT INTO public.likes VALUES (120, 5, 1);
-INSERT INTO public.likes VALUES (122, 7, 1);
-INSERT INTO public.likes VALUES (123, 9, 1);
-INSERT INTO public.likes VALUES (105, 5, 2);
-INSERT INTO public.likes VALUES (106, 6, 2);
-INSERT INTO public.likes VALUES (108, 6, 1);
 
 
 --
 -- Data for Name: posts; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.posts VALUES (2, 'https://br.pinterest.com/pin/607211962283985675/', 'test 1 #pic', 1, NULL);
-INSERT INTO public.posts VALUES (3, 'https://br.pinterest.com/pin/607211962283985675/', 'test 1 #pic', 1, NULL);
-INSERT INTO public.posts VALUES (4, 'https://br.pinterest.com/pin/607211962283985675/', 'test 2 #pic', 1, NULL);
-INSERT INTO public.posts VALUES (5, 'https://www.youtube.com/', 'test 3 #lol
-', 1, NULL);
-INSERT INTO public.posts VALUES (6, 'https://www.devmedia.com.br/clausulas-inner-join-left-join-e-right-join-no-sql-server/18930', 'aaaaaa #test', 2, NULL);
-INSERT INTO public.posts VALUES (7, 'https://linkr-4rno.onrender.com/', 'fksdjfks #vsf', 1, NULL);
-INSERT INTO public.posts VALUES (8, 'https://www.youtube.com/watch?v=8iuLXODzL04&list=RDGMEMCMFH2exzjBeE_zAHHJOdxg&index=20', 'video #vid', 1, 1692897312);
-INSERT INTO public.posts VALUES (9, 'https://www.youtube.com/watch?v=8iuLXODzL04&list=RDGMEMCMFH2exzjBeE_zAHHJOdxg&index=20', 'o #o', 1, 1692897349);
-INSERT INTO public.posts VALUES (10, 'https://www.youtube.com/watch?v=8iuLXODzL04&list=RDGMEMCMFH2exzjBeE_zAHHJOdxg&index=20', 'a #a', 1, 1692897535);
 
 
 --
 -- Data for Name: reposts; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.reposts VALUES (1, 3, 1, NULL);
-INSERT INTO public.reposts VALUES (2, 4, 1, NULL);
-INSERT INTO public.reposts VALUES (4, 10, 1, 1692906677);
-INSERT INTO public.reposts VALUES (5, 9, 1, 1692911772);
 
 
 --
 -- Data for Name: sessions; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.sessions VALUES (1, '2fb780cc-f030-4a65-bbf6-00241ccf1f3a', 1);
-INSERT INTO public.sessions VALUES (2, '1425e7bd-0150-4bd5-97cd-903a8bc88c9d', 2);
-INSERT INTO public.sessions VALUES (3, '66602c71-d571-4a77-9d5f-4b620b0962aa', 1);
-INSERT INTO public.sessions VALUES (5, 'e4e6b8f4-cb56-44f7-b461-2d2ff41e1228', 2);
-INSERT INTO public.sessions VALUES (6, '6ed43459-8948-4e55-8709-cde27ad314aa', 1);
-INSERT INTO public.sessions VALUES (7, 'dc535014-7231-4480-bde6-74a51568c02b', 1);
-INSERT INTO public.sessions VALUES (9, '4ab138fe-d61d-412a-bf20-192f6c48d2f3', 2);
 
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: -
 --
 
-INSERT INTO public.users VALUES (1, 'vitor', 'vitor@hotmail.com', '$2b$04$FNoY7C55Oa1mSq4T9qJ6j.MKtPK7fq6pylpHrD/dRfeyqlALun66K', 'https://i.pinimg.com/originals/ac/1a/74/ac1a7483c5a8613502bd2594fd7ab1bd.jpg');
-INSERT INTO public.users VALUES (2, 'vito', 'vito@hotmail.com', '$2b$04$SYY.JUOk7mZiGVbPS8MwSui/mFHQaFlxku3jiFcTQ1xbtRzzC5QZC', 'https://i.pinimg.com/originals/9e/c7/92/9ec7926f6c458a90d3a14224c4a89a93.jpg');
 
 
 --
 -- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.comments_id_seq', 30, true);
+SELECT pg_catalog.setval('public.comments_id_seq', 1, false);
 
 
 --
 -- Name: follows_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.follows_id_seq', 5, true);
+SELECT pg_catalog.setval('public.follows_id_seq', 1, false);
 
 
 --
 -- Name: hashtags_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.hashtags_id_seq', 9, true);
+SELECT pg_catalog.setval('public.hashtags_id_seq', 1, false);
 
 
 --
 -- Name: likes_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.likes_id_seq', 123, true);
+SELECT pg_catalog.setval('public.likes_id_seq', 1, false);
 
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.posts_id_seq', 10, true);
+SELECT pg_catalog.setval('public.posts_id_seq', 1, false);
 
 
 --
 -- Name: reposts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.reposts_id_seq', 5, true);
+SELECT pg_catalog.setval('public.reposts_id_seq', 1, false);
 
 
 --
 -- Name: sessions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.sessions_id_seq', 9, true);
+SELECT pg_catalog.setval('public.sessions_id_seq', 1, false);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
 
 
 --
