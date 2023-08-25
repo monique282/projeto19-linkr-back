@@ -9,7 +9,7 @@ LEFT JOIN likes ON likes."postId" = posts.id
 LEFT JOIN users ON users.id = likes."userId"
 GROUP BY posts.id, posts.url, posts.content
 ORDER BY posts.id DESC
-LIMIT 20;
+LIMIT 10;
 `;
   return db.query(query);
 }
@@ -39,7 +39,7 @@ LEFT JOIN users ON users.id = likes."userId"
 WHERE posts."userId" = $1
 GROUP BY posts.id, posts.url, posts.content
 ORDER BY posts.id DESC
-LIMIT 20;
+LIMIT 10;
     `,
     [id]
   );
@@ -75,7 +75,7 @@ LEFT JOIN users ON users.id = likes."userId"
 WHERE hashtags.name = $1
 GROUP BY posts.id, posts.url, posts.content
 ORDER BY posts.id DESC
-LIMIT 20;
+LIMIT 10;
   `;
   return db.query(query, [hashtag]);
 }
