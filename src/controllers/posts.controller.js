@@ -64,9 +64,45 @@ export async function getPosts(req, res) {
       }
     }
     response.sort((a, b) => b.createdAt - a.createdAt);
-
+    const slicedResponse = response.slice(0, 10)
     return res.status(200).send({
-      rows: response,
+      rows: slicedResponse,
+      status,
+      followedNames: followStatus.followedNames,
+      followedIds: followStatus.followedIds,
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+export async function getPostsScroll(req, res) {
+  const { userId } = res.locals.user;
+  const {createdAt} = req.query
+  try {
+    const result = await func.sendPostsScroll(createdAt);
+    const reposts = await func.sendRepostsScroll(createdAt);
+    const followStatus = await func.followingStatusDB(userId);
+    let status = "not following";
+    let response = [];
+    const array2 = result.filter((post) => post.userId === userId);
+    const array4 = reposts.filter((post) => post.repostedId === userId);
+    response = [...array2, ...array4];
+    const followedIds = followStatus.followedIds;
+
+    if (followStatus.followedIds.length > 0) {
+      const array1 = result.filter((post) => followedIds.includes(post.userId));
+      const array3 = reposts.filter((post) => followedIds.includes(post.repostedId));
+      response = [...response, ...array1, ...array3];
+
+      if (response.length === 0) {
+        status = "following";
+      }
+    }
+    response.sort((a, b) => b.createdAt - a.createdAt);
+    const slicedResponse = response.slice(0, 10)
+    return res.status(200).send({
+      rows: slicedResponse,
       status,
       followedNames: followStatus.followedNames,
       followedIds: followStatus.followedIds,
@@ -90,7 +126,6 @@ export async function getPostsById(req, res) {
     response.sort((a, b) => b.createdAt - a.createdAt);
 
     if (userId === Number(id)) isUser = true;
-    console.log(isUser);
 
     const obj = {
       name: userInfo.rows[0].name,
@@ -98,7 +133,38 @@ export async function getPostsById(req, res) {
       id: userInfo.rows[0].id,
       statusFollow: userInfo.rows[0].status,
       isUser,
-      posts: response,
+      posts: response.slice(0, 10),
+    };
+    res.status(200).send(obj);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+}
+
+export async function getPostsByIdScroll(req, res) {
+  const { id } = req.params;
+  const { userId } = res.locals.user;
+  const {lastPost} = req.query
+  console.log(lastPost)
+  try {
+    let response = [];
+    let isUser = false;
+    const posts = await func.getUserPostsScroll(id, lastPost);
+    response.push(...posts.rows);
+    const userInfo = await func.getUserInfo(id, userId);
+    const reposts = await func.getUserRepostsScroll(id, lastPost);
+    response.push(...reposts.rows);
+    response.sort((a, b) => b.createdAt - a.createdAt);
+
+    if (userId === Number(id)) isUser = true;
+
+    const obj = {
+      name: userInfo.rows[0].name,
+      image: userInfo.rows[0].image,
+      id: userInfo.rows[0].id,
+      statusFollow: userInfo.rows[0].status,
+      isUser,
+      posts: response.slice(0, 10),
     };
     res.status(200).send(obj);
   } catch (err) {

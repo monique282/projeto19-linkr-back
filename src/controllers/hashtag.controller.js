@@ -1,15 +1,13 @@
-import { getHashtagsDB, getOneHashtagDB } from "../repositories/hashtag.repository.js";
+import { getHashtagsDB, getOneHashtagDBScroll, getOneHashtagDB } from "../repositories/hashtag.repository.js";
 import { likesHashtagDB } from "../repositories/likes.repository.js";
 
 export async function getHashtags ( req, res ) {
     const { user } = res.locals;
     try {
-
         const hashtags = await getHashtagsDB();
-
         return res.status(200).send(hashtags.rows);
-
     } catch (err) {
+        console.log(err)
         return res.status(500).send(err.message);
     }
 }
@@ -26,6 +24,19 @@ export async function getOneHashtag ( req, res ) {
         return res.status(200).send(hashtagPosts.rows);
 
     } catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
+
+export async function getOneHashtagScroll ( req, res ) {
+    const { hashtag } = req.params;
+    const {lastPost} = req.query;
+    try {
+        const hashtags = await getOneHashtagDBScroll(hashtag, lastPost);
+        return res.status(200).send(hashtags.rows);
+
+    } catch (err) {
+        console.log(err)
         return res.status(500).send(err.message);
     }
 }
